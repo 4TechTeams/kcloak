@@ -1,4 +1,4 @@
 package com.fortechteams.kcloak.exception
 
-class BadExpectationException(message: String) : KeycloakClientException(message) {
+class BadExpectationException(message: String) : KCloakException(message) {
 }
