@@ -90,7 +90,4 @@ class KeycloakClient private constructor(
   }
 }
 
-class ClientSettings {
 
-  var createRealmIfNotExists: Boolean = true
-}
