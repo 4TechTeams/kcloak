@@ -1,0 +1,23 @@
+version: "3.7"
+services:
+
+  kc_db:
+    image: postgres
+    environment:
+      POSTGRES_DB: kc
+      POSTGRES_USER: kc
+      POSTGRES_PASSWORD: dB-pas5w0rd!
+
+  keycloak:
+    image: bitnami/keycloak:18
+    environment:
+      KEYCLOAK_DATABASE_HOST: kc_db
+      KEYCLOAK_DATABASE_NAME: kc
+      KEYCLOAK_DATABASE_USER: kc
+      KEYCLOAK_DATABASE_PASSWORD: dB-pas5w0rd!
+      KEYCLOAK_ADMIN_USER: admin
+      KEYCLOAK_ADMIN_PASSWORD: 12345678
+    depends_on:
+      - kc_db
+    ports:
+      - 8090:8080
