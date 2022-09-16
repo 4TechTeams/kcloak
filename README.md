@@ -3,7 +3,7 @@ KCloak
 
 *An opinionated Client implementation for Keycloak, the "k" stands for Kotlin*
 
-![example workflow](https://github.com/4techteams/kcloak/actions/workflows/gradle.yml/badge.svg)
+![CI Status](https://github.com/4techteams/kcloak/actions/workflows/gradle.yml/badge.svg)
 
 Back then, one dev in some software engineering team accidentally pronounced the famous identity provider 
 "Kaycloak". Another guy who knew that Kotlin users tend to prefix their libraries with "k" came up with "k-cloak". Thats 
@@ -16,8 +16,6 @@ well-documented calls, but still used the java client internally for maximum com
 **TBD**
 
 ## Usage
-
-### Create an Instance
 
 KCloak internally relies on the low-level java client of Keycloak. The easiest way to build a `Keycloak` instance, is
 using the supplied builder:
@@ -45,10 +43,13 @@ val kc = KCloak.of(
 }
 ```
 
+**More examples can be found in [KCloakTest](src/test/kotlin/com/fortechteams/kcloak/KCloakTest.kt)**
+
 ### Realms
 
 > A realm manages a set of users, credentials, roles, and groups. A user belongs to and logs into a realm. Realms are 
 > isolated from one another and can only manage and authenticate the users that they control.
+> 
 > [Core concepts and terms](https://www.keycloak.org/docs/latest/server_admin/#core-concepts-and-terms)
 
 The following call resolves a realm and returns a [RealmClient](src/main/kotlin/com/fortechteams/kcloak/RealmClient.kt) 
@@ -66,7 +67,7 @@ masterRealm.info()
 
 #### Auto Creation
 
-When calling `ky.realm("foo")`, by default, the realm will be auto-created if it doesn't exist. This can be disabled by
+When calling `kc.realm("foo")`, by default, the realm will be auto-created if it doesn't exist. This can be disabled by
 setting the `createRealmIfNotExists` client setting to `false`.
 
 #### Updates
@@ -74,10 +75,12 @@ setting the `createRealmIfNotExists` client setting to `false`.
 Realm settings can be updated with the following call:
 
 ```kotlin
-realm.update {
+masterRealm.update {
   isEnabled = true
   displayName = "Some name..."
   isResetPasswordAllowed = false
   isDuplicateEmailsAllowed = true
 }
 ```
+
+**More examples can be found in [RealmClientTest](src/test/kotlin/com/fortechteams/kcloak/RealmClientTest.kt)**

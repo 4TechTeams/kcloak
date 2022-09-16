@@ -1,30 +1,30 @@
 package com.fortechteams.kcloak
 
+import com.fortechteams.kcloak.TestUtil.assertIsUp
+import com.fortechteams.kcloak.exception.BadExpectationException
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import com.fortechteams.kcloak.TestUtil.assertIsUp
-import com.fortechteams.kcloak.exception.BadExpectationException
 import java.util.*
 import kotlin.test.assertTrue
 
-internal class KCloakClientTest {
+internal class KCloakTest {
 
   private val kc by lazy {
-    KCloakClient.of(KCUtil.localKeycloakBuilder)
+    KCloak.of(KCUtil.localKeycloakBuilder)
   }
 
   @Test
   fun `builds client from builder with default settings`() {
-    KCloakClient
+    KCloak
       .of(KCUtil.localKeycloakBuilder)
       .assertIsUp()
   }
 
   @Test
   fun `builds client from instance with default settings`() {
-    KCloakClient
+    KCloak
       .of(KCUtil.localKeycloakBuilder.build())
       .assertIsUp()
   }
@@ -53,7 +53,7 @@ internal class KCloakClientTest {
     val realmName = "does-not-exist_${UUID.randomUUID()}"
 
     assertThrows<BadExpectationException> {
-      val c = KCloakClient.of(KCUtil.localKeycloakBuilder) {
+      val c = KCloak.of(KCUtil.localKeycloakBuilder) {
         createRealmIfNotExists = false
       }
 

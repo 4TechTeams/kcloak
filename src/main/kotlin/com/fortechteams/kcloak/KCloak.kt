@@ -6,7 +6,7 @@ import org.keycloak.representations.info.ServerInfoRepresentation
 import com.fortechteams.kcloak.exception.BadExpectationException
 import com.fortechteams.kcloak.exception.PermissionException
 
-interface KCloakClient {
+interface KCloak {
 
   /**
    * Returns an information object about the Keycloak server instance.
@@ -31,23 +31,23 @@ interface KCloakClient {
 
   companion object {
 
-    fun of(keycloakInstance: Keycloak): KCloakClientImpl =
-      KCloakClientImpl(keycloakInstance, ClientSettings())
+    fun of(keycloakInstance: Keycloak): KCloakImpl =
+      KCloakImpl(keycloakInstance, ClientSettings())
 
-    fun of(keycloakBuilder: KeycloakBuilder): KCloakClientImpl =
+    fun of(keycloakBuilder: KeycloakBuilder): KCloakImpl =
       of(keycloakBuilder.build())
 
-    fun of(keycloakInstance: Keycloak, clientSettings: ClientSettings): KCloakClientImpl =
-      KCloakClientImpl(keycloakInstance, clientSettings)
+    fun of(keycloakInstance: Keycloak, clientSettings: ClientSettings): KCloakImpl =
+      KCloakImpl(keycloakInstance, clientSettings)
 
-    fun of(keycloakInstance: Keycloak, settingsFn: ClientSettings.() -> Unit): KCloakClientImpl {
+    fun of(keycloakInstance: Keycloak, settingsFn: ClientSettings.() -> Unit): KCloakImpl {
       val cs = ClientSettings()
       settingsFn(cs)
 
       return of(keycloakInstance, cs)
     }
 
-    fun of(keycloakBuilder: KeycloakBuilder, settingsFn: ClientSettings.() -> Unit): KCloakClientImpl =
+    fun of(keycloakBuilder: KeycloakBuilder, settingsFn: ClientSettings.() -> Unit): KCloakImpl =
       of(keycloakBuilder.build(), settingsFn)
   }
 }

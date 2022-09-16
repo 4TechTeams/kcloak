@@ -7,7 +7,7 @@ import java.util.*
 internal class RealmClientTest {
 
   private val kc by lazy {
-    KCloakClient.of(KCUtil.localKeycloakBuilder)
+    KCloak.of(KCUtil.localKeycloakBuilder)
   }
 
   @Test

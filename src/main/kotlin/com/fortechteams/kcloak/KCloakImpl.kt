@@ -10,10 +10,10 @@ import com.fortechteams.kcloak.exception.StateException
 import javax.ws.rs.ForbiddenException
 import javax.ws.rs.NotFoundException
 
-class KCloakClientImpl(
+class KCloakImpl(
   private val kc: Keycloak,
   private val clientSettings: ClientSettings
-) : KCloakClient {
+) : KCloak {
 
   private val log = LoggerFactory.getLogger(javaClass)
 
