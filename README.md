@@ -1,7 +1,9 @@
-kcloak
-======================
+KCloak
+======
 
 *An opinionated Client implementation for Keycloak, the "k" stands for Kotlin*
+
+![example workflow](https://github.com/4techteams/kcloak/actions/workflows/gradle.yml/badge.svg)
 
 Back then, one dev in some software engineering team accidentally pronounced the famous identity provider 
 "Kaycloak". Another guy who knew that Kotlin users tend to prefix their libraries with "k" came up with "k-cloak". Thats 
