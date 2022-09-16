@@ -11,7 +11,7 @@ import kotlin.test.assertTrue
 
 internal class KCloakClientTest {
 
-  private val client by lazy {
+  private val kc by lazy {
     KCloakClient.of(KCUtil.localKeycloakBuilder)
   }
 
@@ -32,7 +32,7 @@ internal class KCloakClientTest {
   @Test
   fun `get realm client for existing realm`() {
     val realmName = "master"
-    val realm = client.realm(realmName)
+    val realm = kc.realm(realmName)
 
     assertEquals(realmName, realm.representation().realm)
     assertTrue(realm.representation().isEnabled)
@@ -41,7 +41,7 @@ internal class KCloakClientTest {
   @Test
   fun `get realm client for missing realm with auto creation`() {
     val realmName = "does-not-exist_${UUID.randomUUID()}"
-    val realm = client.realm(realmName)
+    val realm = kc.realm(realmName)
 
     assertEquals(realmName, realm.representation().realm)
     // auto-created realm should not be enabled

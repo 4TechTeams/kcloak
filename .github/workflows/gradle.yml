@@ -33,7 +33,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
 
       - name: Test & Build
-        run: ./gradlew test build
+        run: ./gradlew --no-daemon --console=plain test build
 
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v3
