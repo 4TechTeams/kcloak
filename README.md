@@ -49,8 +49,7 @@ val kc = KCloak.of(
 
 > A realm manages a set of users, credentials, roles, and groups. A user belongs to and logs into a realm. Realms are 
 > isolated from one another and can only manage and authenticate the users that they control.
-> 
-> [Core concepts and terms](https://www.keycloak.org/docs/latest/server_admin/#core-concepts-and-terms)
+> – [Core concepts and terms](https://www.keycloak.org/docs/latest/server_admin/#core-concepts-and-terms)
 
 The following call resolves a realm and returns a [RealmClient](src/main/kotlin/com/fortechteams/kcloak/RealmClient.kt) 
 instance for it:
