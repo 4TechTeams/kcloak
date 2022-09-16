@@ -13,21 +13,21 @@ class RealmClient(
     private val realmRes: RealmResource
 ) {
 
-  fun representation(): RealmRepresentation =
-    realmRes.toRepresentation()
+    fun representation(): RealmRepresentation =
+        realmRes.toRepresentation()
 
-  fun updateSettings(updateFn: RealmRepresentation.() -> Unit) {
-    val rep = representation()
-    updateFn(rep)
+    fun updateSettings(updateFn: RealmRepresentation.() -> Unit) {
+        val rep = representation()
+        updateFn(rep)
 
-    try {
-      realmRes.update(rep)
-    } catch (e: ForbiddenException) {
-      throw PermissionException(e)
-    } catch (e: NotAllowedException) {
-      throw PermissionException(e)
+        try {
+            realmRes.update(rep)
+        } catch (e: ForbiddenException) {
+            throw PermissionException(e)
+        } catch (e: NotAllowedException) {
+            throw PermissionException(e)
+        }
     }
-  }
 
 
 }
