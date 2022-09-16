@@ -43,7 +43,7 @@ val kc = KCloak.of(
 }
 ```
 
-**More examples can be found in [KCloakTest](src/test/kotlin/com/fortechteams/kcloak/KCloakTest.kt)**
+*More examples can be found in [KCloakTest](src/test/kotlin/com/fortechteams/kcloak/KCloakTest.kt)*
 
 ### Realms
 
@@ -82,4 +82,4 @@ masterRealm.update {
 }
 ```
 
-**More examples can be found in [RealmClientTest](src/test/kotlin/com/fortechteams/kcloak/RealmClientTest.kt)**
+*More examples can be found in [RealmClientTest](src/test/kotlin/com/fortechteams/kcloak/RealmClientTest.kt)*
