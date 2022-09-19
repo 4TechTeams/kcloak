@@ -111,6 +111,9 @@ val c2 = clientsDsl("client-foo2")
 // explicitly create a client
 ```
 
+The example above uses the invoke-syntax (`clientsDsl("...")`) which is an alias of `clientsDsl.get("...")`. It's just a 
+matter of style.
+
 #### Auto Creation
 
 When calling `clientsDsl("client-foo2")`, by default, the client will be auto-created if it doesn't exist. This can be 
