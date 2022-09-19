@@ -11,4 +11,11 @@ class Settings {
    * Auto-created realms are always disabled by default
    */
   var createRealmIfNotExists: Boolean = true
+
+  /**
+   * Indicates if a missing client should be created automatically or not
+   *
+   * Auto-created clients are always disabled by default
+   */
+  var createClientIfNotExists: Boolean = true
 }

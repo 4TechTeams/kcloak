@@ -10,6 +10,11 @@ import javax.ws.rs.NotAllowedException
 interface RealmDsl {
 
   /**
+   * Returns an instance of [ClientsDsl] for given realm
+   */
+  val clients: ClientsDsl
+
+  /**
    * Returns a representation fo the realm
    */
   fun representation(): RealmRepresentation
@@ -41,6 +46,10 @@ class RealmDslImpl(
   private val settings: Settings,
   private val realmRes: RealmResource
 ) : RealmDsl {
+
+  override val clients: ClientsDsl by lazy {
+    ClientsDslImpl(settings, realmRes.clients())
+  }
 
   override fun representation(): RealmRepresentation =
     realmRes.toRepresentation()
