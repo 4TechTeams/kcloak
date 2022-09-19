@@ -51,7 +51,7 @@ val kc = KCloak.of(
 > isolated from one another and can only manage and authenticate the users that they control.
 > – [Core concepts and terms](https://www.keycloak.org/docs/latest/server_admin/#core-concepts-and-terms)
 
-The following call resolves a realm and returns a [RealmClient](src/main/kotlin/com/fortechteams/kcloak/RealmClient.kt) 
+The following call resolves a realm and returns a [RealmDsl](src/main/kotlin/com/fortechteams/kcloak/RealmDsl.kt) 
 instance for it:
 
 ```kotlin
@@ -82,4 +82,4 @@ masterRealm.update {
 }
 ```
 
-*More examples can be found in [RealmClientTest](src/test/kotlin/com/fortechteams/kcloak/RealmClientTest.kt)*
+*More examples can be found in [RealmDslTest](src/test/kotlin/com/fortechteams/kcloak/RealmDslTest.kt)*

@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.util.*
 
-internal class RealmClientTest {
+internal class RealmDslTest {
 
   private val kc by lazy {
     KCloak.of(KCUtil.localKeycloakBuilder)

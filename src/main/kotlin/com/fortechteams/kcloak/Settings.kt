@@ -1,9 +1,9 @@
-package swiss.docbox.keycloakclient
+package com.fortechteams.kcloak
 
 /**
- * Provides behavioral settings for a given Keycloak client
+ * Provides behavioral settings for a given KCloak instance
  */
-class ClientSettings {
+class Settings {
 
   /**
    * Indicates if a missing realm should be created automatically or not
