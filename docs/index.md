@@ -1,7 +1,4 @@
-KCloak
-======
-
-*An opinionated Client implementation for Keycloak, the "k" stands for Kotlin*
+*KCloak is an opinionated Client implementation for Keycloak, the "k" stands for Kotlin*
 
 ![CI Status](https://github.com/4techteams/kcloak/actions/workflows/gradle.yml/badge.svg)
 
