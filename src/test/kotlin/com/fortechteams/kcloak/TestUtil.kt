@@ -4,6 +4,6 @@ import kotlin.test.assertNotNull
 
 object TestUtil {
 
-  fun KCloakImpl.assertIsUp() =
+  fun KCloak.assertIsUp() =
     assertNotNull(this.info().systemInfo.uptime)
 }

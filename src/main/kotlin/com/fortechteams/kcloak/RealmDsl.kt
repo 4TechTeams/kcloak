@@ -15,6 +15,11 @@ interface RealmDsl {
   val clients: ClientsDsl
 
   /**
+   * Returns an instance of [ClientScopesDsl] for given realm
+   */
+  val clientScopes: ClientScopesDsl
+
+  /**
    * Returns a representation fo the realm
    */
   fun representation(): RealmRepresentation
@@ -49,6 +54,10 @@ class RealmDslImpl(
 
   override val clients: ClientsDsl by lazy {
     ClientsDslImpl(settings, realmRes.clients())
+  }
+
+  override val clientScopes: ClientScopesDsl by lazy {
+    ClientScopesDslImpl(settings, realmRes.clientScopes())
   }
 
   override fun representation(): RealmRepresentation =

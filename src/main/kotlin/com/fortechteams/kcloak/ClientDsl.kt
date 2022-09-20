@@ -12,6 +12,11 @@ interface ClientDsl {
    * Returns a representation for the client
    */
   fun representation(): ClientRepresentation
+
+  /**
+   * Updates a clients properties
+   */
+  fun update(updateFn: ClientRepresentation.() -> Unit)
 }
 
 class ClientDslImpl(
@@ -28,4 +33,16 @@ class ClientDslImpl(
       throw PermissionException(e)
     }
 
+  override fun update(updateFn: ClientRepresentation.() -> Unit) {
+    val rep = representation()
+    updateFn(rep)
+
+    try {
+      clientRes.update(rep)
+    } catch (e: ForbiddenException) {
+      throw PermissionException(e)
+    } catch (e: NotAllowedException) {
+      throw PermissionException(e)
+    }
+  }
 }

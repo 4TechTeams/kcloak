@@ -18,4 +18,11 @@ class Settings {
    * Auto-created clients are always disabled by default
    */
   var createClientIfNotExists: Boolean = true
+
+  /**
+   * Indicates if a missing client scope should be created automatically or not
+   *
+   * Auto-created clients scopes are always disabled by default
+   */
+  var createClientScopeIfNotExists: Boolean = true
 }

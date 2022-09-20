@@ -36,23 +36,23 @@ interface KCloak {
 
   companion object {
 
-    fun of(keycloakInstance: Keycloak): KCloakImpl =
+    fun of(keycloakInstance: Keycloak): KCloak =
       KCloakImpl(keycloakInstance, Settings())
 
-    fun of(keycloakBuilder: KeycloakBuilder): KCloakImpl =
+    fun of(keycloakBuilder: KeycloakBuilder): KCloak =
       of(keycloakBuilder.build())
 
-    fun of(keycloakInstance: Keycloak, settings: Settings): KCloakImpl =
+    fun of(keycloakInstance: Keycloak, settings: Settings): KCloak =
       KCloakImpl(keycloakInstance, settings)
 
-    fun of(keycloakInstance: Keycloak, settingsFn: Settings.() -> Unit): KCloakImpl {
+    fun of(keycloakInstance: Keycloak, settingsFn: Settings.() -> Unit): KCloak {
       val cs = Settings()
       settingsFn(cs)
 
       return of(keycloakInstance, cs)
     }
 
-    fun of(keycloakBuilder: KeycloakBuilder, settingsFn: Settings.() -> Unit): KCloakImpl =
+    fun of(keycloakBuilder: KeycloakBuilder, settingsFn: Settings.() -> Unit): KCloak =
       of(keycloakBuilder.build(), settingsFn)
   }
 }
