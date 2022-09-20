@@ -3,6 +3,7 @@ package com.fortechteams.kcloak
 import com.fortechteams.kcloak.exception.StateException
 import org.keycloak.admin.client.resource.RealmsResource
 import org.keycloak.representations.idm.RealmRepresentation
+import org.slf4j.LoggerFactory
 import javax.ws.rs.NotFoundException
 
 interface RealmsDsl {
@@ -24,7 +25,7 @@ interface RealmsDsl {
    * Indicates if a realm exists
    *
    * Note: This underlying call is [get], so if you anyway need the [RealmDsl] / [RealmRepresentation], directly call
-   * [get] and add a null check, instea dof calling [exists] and [get] successively.
+   * [get] and add a null check, instead of calling [exists] and [get] successively.
    */
   fun exists(name: String): Boolean
 
@@ -56,16 +57,16 @@ interface RealmsDsl {
 }
 
 class RealmsDslImpl(
-  private val settings: Settings,
   private val realmsResource: RealmsResource
 ) : RealmsDsl {
 
+  private val log = LoggerFactory.getLogger(javaClass)
   private val errorHandler = ErrorHandler("realm")
 
   override fun all(): List<RealmDsl> =
     allRepresentations()
       .map {
-        RealmDslImpl(settings, realmsResource.realm(it.realm), it)
+        RealmDslImpl(realmsResource.realm(it.realm), it)
       }
 
   override fun allRepresentations(): List<RealmRepresentation> =
@@ -79,7 +80,13 @@ class RealmsDslImpl(
   override fun get(name: String): RealmDsl? =
     errorHandler.wrap {
       try {
-        RealmDslImpl(settings, realmsResource.realm(name))
+        // realmsResource.realm does not validate if the realm exists, therefore we need this workaround to check...
+        realmsResource
+          .findAll()
+          .find { it.realm == name }
+          ?.let {
+            RealmDslImpl(realmsResource.realm(it.realm))
+          }
       } catch (e: NotFoundException) {
         // we're a bit less strict here and support null instead of throwing exceptions
         null
@@ -98,6 +105,7 @@ class RealmsDslImpl(
 
   override fun create(name: String, updateFn: RealmRepresentation.() -> Unit): RealmDsl =
     errorHandler.wrap {
+      log.debug("Creating realm with name $name")
       val rep = RealmRepresentation()
       rep.realm = name
 
@@ -106,12 +114,14 @@ class RealmsDslImpl(
       realmsResource.create(rep)
 
       get(name) ?: throw StateException(
-        "Realm $name shoudl have been created, but was not found. This is an internal error and either indicates an " +
+        "Realm $name shoud have been created, but was not found. This is an internal error and either indicates an " +
           "implementation problem, or a race-condition."
       )
     }
 
   override fun getOrCreate(name: String): RealmDsl =
-    get(name) ?: create(name) {}
+    get(name) ?: create(name) {
+      isEnabled = false
+    }
 
 }

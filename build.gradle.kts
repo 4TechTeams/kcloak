@@ -31,7 +31,8 @@ dependencies {
 
   testImplementation("io.mockk", "mockk", "1.9.3")
   testImplementation(kotlin("test"))
-  testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+  testImplementation("org.junit.jupiter:junit-jupiter:5.9.0")
+  testImplementation("ch.qos.logback:logback-classic:1.4.1")
 }
 
 java {

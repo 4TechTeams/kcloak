@@ -25,7 +25,6 @@ interface ClientScopeDsl {
 }
 
 class ClientScopeDslImpl(
-  private val settings: Settings,
   private val clientScopeResource: ClientScopeResource
 ) : ClientScopeDsl {
 

@@ -1,12 +1,8 @@
 package com.fortechteams.kcloak
 
-import com.fortechteams.kcloak.exception.BadExpectationException
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import java.util.*
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 internal class ClientsDslTest {
 
@@ -14,49 +10,44 @@ internal class ClientsDslTest {
     KCloak.of(KCUtil.localKeycloakBuilder)
   }
 
-  @Test
-  fun `get and auto-create client`() {
-    val clientDsl = kc
+  private val clientsDsl =
+    KCloak
+      .of(KCUtil.localKeycloakBuilder)
       .realm("clients-dsl-test_${UUID.randomUUID()}")
       .clients
 
-    val c1 = clientDsl("foo1")
+  @Test
+  fun `get or create`() {
+    val name = "client_${UUID.randomUUID()}"
+    val c1 = clientsDsl.getOrCreate(name)
+    val rep = c1.representation()
 
-    assertEquals("foo1", c1.representation().clientId)
+    assertEquals(name, rep.clientId)
+    assertFalse(rep.isEnabled)
   }
 
   @Test
-  fun `get not existing with auto-create disabled`() {
-    val clientDsl = KCloak
-      .of(KCUtil.localKeycloakBuilder) {
-        createClientIfNotExists = false
-      }
-      .realm("clients-dsl-test_${UUID.randomUUID()}")
-      .clients
-
-    assertThrows<BadExpectationException> {
-      clientDsl("foo1")
-    }
+  fun `get representation and dsl should return null if not exists`() {
+    assertNull(clientsDsl.get("does-not-exist_1"))
+    assertNull(clientsDsl.getRepresentation("does-not-exist_2"))
   }
 
   @Test
-  fun `create and get`() {
-    val clientDsl = KCloak
-      .of(KCUtil.localKeycloakBuilder) {
-        createClientIfNotExists = false
-      }
-      .realm("clients-dsl-test_${UUID.randomUUID()}")
-      .clients
+  fun `explicit create with exists and get`() {
+    val name = "client_${UUID.randomUUID()}"
 
-    clientDsl.create("foo2") {
+    clientsDsl.create(name) {
       isEnabled = true
       attributes = mapOf("bar" to "baz")
     }
 
-    val c2 = clientDsl.get("foo2").representation()
+    assertTrue(clientsDsl.exists(name))
 
-    assertTrue(c2.isEnabled)
-    assertNotNull(c2.attributes["bar"])
-    assertEquals("baz", c2.attributes["bar"]!!)
+    val rep = clientsDsl.getRepresentation(name)
+
+    assertNotNull(rep)
+    assertTrue(rep.isEnabled)
+    assertNotNull(rep.attributes["bar"])
+    assertEquals("baz", rep.attributes["bar"]!!)
   }
 }

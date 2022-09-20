@@ -1,10 +1,7 @@
 package com.fortechteams.kcloak
 
-import com.fortechteams.kcloak.exception.PermissionException
 import org.keycloak.admin.client.resource.ClientResource
 import org.keycloak.representations.idm.ClientRepresentation
-import javax.ws.rs.ForbiddenException
-import javax.ws.rs.NotAllowedException
 
 interface ClientDsl {
 
@@ -17,32 +14,40 @@ interface ClientDsl {
    * Updates a clients properties
    */
   fun update(updateFn: ClientRepresentation.() -> Unit)
+
+  fun enable()
+
+  fun disable()
 }
 
 class ClientDslImpl(
-  private val settings: Settings,
-  private val clientRes: ClientResource
+  private val clientRes: ClientResource,
+  private val clientRep: ClientRepresentation? = null
 ) : ClientDsl {
 
+  private val errorHandler = ErrorHandler("client")
+
   override fun representation(): ClientRepresentation =
-    try {
-      clientRes.toRepresentation()
-    } catch (e: ForbiddenException) {
-      throw PermissionException(e)
-    } catch (e: NotAllowedException) {
-      throw PermissionException(e)
+    errorHandler.wrap {
+      clientRep ?: clientRes.toRepresentation()
     }
 
   override fun update(updateFn: ClientRepresentation.() -> Unit) {
     val rep = representation()
     updateFn(rep)
 
-    try {
+    errorHandler.wrap {
       clientRes.update(rep)
-    } catch (e: ForbiddenException) {
-      throw PermissionException(e)
-    } catch (e: NotAllowedException) {
-      throw PermissionException(e)
     }
   }
+
+  override fun enable() =
+    update {
+      isEnabled = true
+    }
+
+  override fun disable() =
+    update {
+      isEnabled = false
+    }
 }

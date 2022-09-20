@@ -1,90 +1,112 @@
 package com.fortechteams.kcloak
 
-import com.fortechteams.kcloak.exception.BadExpectationException
-import com.fortechteams.kcloak.exception.PermissionException
+import com.fortechteams.kcloak.exception.StateException
 import org.keycloak.admin.client.resource.ClientsResource
 import org.keycloak.representations.idm.ClientRepresentation
-import javax.ws.rs.ForbiddenException
-import javax.ws.rs.NotAllowedException
+import javax.ws.rs.NotFoundException
 
 interface ClientsDsl {
 
   /**
-   * Alias for [ClientsDsl.get]
-   */
-  operator fun invoke(clientId: String): ClientDsl = get(clientId)
-
-  /**
    * Returns a list of all clients on the given realm
    */
-  fun all(): List<ClientRepresentation>
+  fun all(): List<ClientDsl>
 
   /**
-   * Gets the [ClientRepresentation] for a given client id
+   * Returns a list of all client representations
+   */
+  fun allRepresentations(): List<ClientRepresentation>
+
+  /**
+   * Indicates if a client exists
    *
-   * If the client does not exist and the setting [Settings.getCreateClientIfNotExists] is not set to false, it will be
-   * created automatically.
+   * Note: This underlying call is [get], so if you anyway need the [ClientDsl] / [ClientRepresentation], directly call
+   * [get] and add a null check, instead of calling [exists] and [get] successively.
    */
-  fun get(clientId: String): ClientDsl
+  fun exists(name: String): Boolean
 
   /**
-   * Creates a new client with given clientId and settings
+   * Gets a client as its DSL
    */
-  fun create(clientId: String, updateFn: ClientRepresentation.() -> Unit)
+  fun get(name: String): ClientDsl?
+
+  /**
+   * Gets a client as its [ClientRepresentation]
+   */
+  fun getRepresentation(name: String): ClientRepresentation?
+
+  /**
+   * Creates a new realm
+   *
+   * Note: There is no "exists" check. You need to make sure an entity with a given name does not exist, before you
+   * create one. Otherwise, this call will fail.
+   */
+  fun create(name: String, updateFn: ClientRepresentation.() -> Unit): ClientDsl
+
+  /**
+   * Get a client as [ClientDsl] or creates it, if it doesn't exist
+   *
+   * Note: Newly created clients using this method are always disabled by default. use explicit [create] and supply
+   * parameters accordingly, to directly enable clients. Otherwise, call [ClientDsl.enable] after creating.
+   */
+  fun getOrCreate(name: String): ClientDsl
 }
 
 class ClientsDslImpl(
-  private val settings: Settings,
   private val clientsResource: ClientsResource
 ) : ClientsDsl {
 
-  override fun all(): List<ClientRepresentation> =
-    try {
-      clientsResource.findAll()
-    } catch (e: ForbiddenException) {
-      throw PermissionException(e)
-    } catch (e: NotAllowedException) {
-      throw PermissionException(e)
-    }
+  private val errorHandler = ErrorHandler("client")
 
-  override fun get(clientId: String): ClientDsl =
-    try {
-      val existing: ClientRepresentation? = clientsResource.findByClientId(clientId)?.firstOrNull()
-
-      val cRep = if (existing == null && settings.createClientIfNotExists) {
-        create(clientId) {
-          isEnabled = false
-        }
-        clientsResource.findByClientId(clientId).first()
-
-      } else {
-        existing
-          ?: throw BadExpectationException("Client with id $clientId does not exist and auto-creation has been disabled")
+  override fun all(): List<ClientDsl> =
+    allRepresentations()
+      .map {
+        ClientDslImpl(clientsResource.get(it.id), it)
       }
 
-      ClientDslImpl(settings, clientsResource.get(cRep.id))
-
-    } catch (e: ForbiddenException) {
-      throw PermissionException(e)
-    } catch (e: NotAllowedException) {
-      throw PermissionException(e)
+  override fun allRepresentations(): List<ClientRepresentation> =
+    errorHandler.wrap {
+      clientsResource.findAll()
     }
 
-  override fun create(clientId: String, updateFn: ClientRepresentation.() -> Unit) {
+  override fun exists(name: String): Boolean =
+    getRepresentation(name) != null
 
-    val cRep = ClientRepresentation()
-    cRep.clientId = clientId
-
-    updateFn(cRep)
-
-    try {
-      clientsResource.create(cRep)
-    } catch (e: ForbiddenException) {
-      throw PermissionException(e)
-    } catch (e: NotAllowedException) {
-      throw PermissionException(e)
+  override fun get(name: String): ClientDsl? =
+    errorHandler.wrap {
+      getRepresentation(name)
+        ?.let {
+          ClientDslImpl(clientsResource.get(it.id), it)
+        }
     }
-  }
 
+  override fun getRepresentation(name: String): ClientRepresentation? =
+    errorHandler.wrap {
+      try {
+        clientsResource.findByClientId(name)?.firstOrNull()
+      } catch (e: NotFoundException) {
+        null
+      }
+    }
+
+  override fun create(name: String, updateFn: ClientRepresentation.() -> Unit): ClientDsl =
+    errorHandler.wrap {
+      val rep = ClientRepresentation()
+      rep.clientId = name
+
+      updateFn(rep)
+
+      clientsResource.create(rep)
+
+      get(name) ?: throw StateException(
+        "Client with id $name shoud have been created, but was not found. This is an internal error and either " +
+          "indicates an implementation problem, or a race-condition."
+      )
+    }
+
+  override fun getOrCreate(name: String): ClientDsl =
+    get(name) ?: create(name) {
+      isEnabled = false
+    }
 
 }

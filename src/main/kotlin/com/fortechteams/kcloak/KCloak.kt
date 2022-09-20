@@ -1,15 +1,11 @@
 package com.fortechteams.kcloak
 
+import com.fortechteams.kcloak.exception.PermissionException
 import org.keycloak.admin.client.Keycloak
 import org.keycloak.admin.client.KeycloakBuilder
 import org.keycloak.representations.info.ServerInfoRepresentation
-import com.fortechteams.kcloak.exception.BadExpectationException
-import com.fortechteams.kcloak.exception.PermissionException
-import com.fortechteams.kcloak.exception.StateException
-import org.keycloak.representations.idm.RealmRepresentation
 import org.slf4j.LoggerFactory
 import javax.ws.rs.ForbiddenException
-import javax.ws.rs.NotFoundException
 
 interface KCloak {
 
@@ -28,49 +24,31 @@ interface KCloak {
   fun info(): ServerInfoRepresentation
 
   /**
-   * Opens a [RealmDslImpl] for given realm
+   * Opens a [RealmDsl] for a given realm
    *
-   * If the realm does not exist, it will be created by default. However, you can disable automatic realm ceation by
-   * setting [Settings.createRealmIfNotExists] to `false` in client-settings. This can be helpful, if e.g. your
-   * current client does not have permission to create realms. In the later case, a [BadExpectationException] will be
-   * thrown.
-   *
-   * @throws BadExpectationException If the realm does not exist, but automatic realm creation was disabled.
+   * if the realm does not exist, it will be created automatically. This is actually santactic sugar for
+   * [RealmsDsl.getOrCreate]
    */
   fun realm(name: String): RealmDsl
 
   companion object {
 
     fun of(keycloakInstance: Keycloak): KCloak =
-      KCloakImpl(Settings(), keycloakInstance)
+      KCloakImpl(keycloakInstance)
 
     fun of(keycloakBuilder: KeycloakBuilder): KCloak =
       of(keycloakBuilder.build())
-
-    fun of(keycloakInstance: Keycloak, settings: Settings): KCloak =
-      KCloakImpl(settings, keycloakInstance)
-
-    fun of(keycloakInstance: Keycloak, settingsFn: Settings.() -> Unit): KCloak {
-      val cs = Settings()
-      settingsFn(cs)
-
-      return of(keycloakInstance, cs)
-    }
-
-    fun of(keycloakBuilder: KeycloakBuilder, settingsFn: Settings.() -> Unit): KCloak =
-      of(keycloakBuilder.build(), settingsFn)
   }
 }
 
 class KCloakImpl(
-  private val settings: Settings,
   private val kc: Keycloak
 ) : KCloak {
 
   private val log = LoggerFactory.getLogger(javaClass)
 
   override val realms: RealmsDsl by lazy {
-    RealmsDslImpl(settings, kc.realms())
+    RealmsDslImpl(kc.realms())
   }
 
   override fun info(): ServerInfoRepresentation =
@@ -80,28 +58,6 @@ class KCloakImpl(
       throw PermissionException(e)
     }
 
-  override fun realm(name: String): RealmDsl {
-    val existing = kc.realms().findAll().find { it.realm == name } != null
-
-    if (!existing) {
-      if (settings.createRealmIfNotExists) {
-        log.debug("Realm $name does not exist, creating it...")
-        val rep = RealmRepresentation()
-        rep.realm = name
-
-        kc.realms().create(rep)
-      } else {
-        throw BadExpectationException("Realm with name $name does not exist, and setting 'createRealmIfNotExists' has been set to false!")
-      }
-    }
-
-    try {
-      val realmRes = kc.realms().realm(name)
-
-      return RealmDslImpl(settings, realmRes)
-
-    } catch (e: NotFoundException) {
-      throw StateException("Requested realm $name could not be fetched from Keycloak instance!", e)
-    }
-  }
+  override fun realm(name: String): RealmDsl =
+    realms.getOrCreate(name)
 }

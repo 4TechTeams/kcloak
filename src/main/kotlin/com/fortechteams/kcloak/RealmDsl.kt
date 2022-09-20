@@ -47,17 +47,16 @@ interface RealmDsl {
 }
 
 class RealmDslImpl(
-  private val settings: Settings,
   private val realmRes: RealmResource,
   private val realmRep: RealmRepresentation? = null
 ) : RealmDsl {
 
   override val clients: ClientsDsl by lazy {
-    ClientsDslImpl(settings, realmRes.clients())
+    ClientsDslImpl(realmRes.clients())
   }
 
   override val clientScopes: ClientScopesDsl by lazy {
-    ClientScopesDslImpl(settings, realmRes.clientScopes())
+    ClientScopesDslImpl(realmRes.clientScopes())
   }
 
   override fun representation(): RealmRepresentation =

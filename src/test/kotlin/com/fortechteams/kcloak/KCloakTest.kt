@@ -30,15 +30,6 @@ internal class KCloakTest {
   }
 
   @Test
-  fun `get realm client for existing realm`() {
-    val realmName = "master"
-    val realm = kc.realm(realmName)
-
-    assertEquals(realmName, realm.representation().realm)
-    assertTrue(realm.representation().isEnabled)
-  }
-
-  @Test
   fun `get realm client for missing realm with auto creation`() {
     val realmName = "does-not-exist_${UUID.randomUUID()}"
     val realm = kc.realm(realmName)
@@ -46,18 +37,5 @@ internal class KCloakTest {
     assertEquals(realmName, realm.representation().realm)
     // auto-created realm should not be enabled
     assertFalse(realm.representation().isEnabled)
-  }
-
-  @Test
-  fun `get realm client for missing realm with disabled auto creation`() {
-    val realmName = "does-not-exist_${UUID.randomUUID()}"
-
-    assertThrows<BadExpectationException> {
-      val c = KCloak.of(KCUtil.localKeycloakBuilder) {
-        createRealmIfNotExists = false
-      }
-
-      c.realm(realmName)
-    }
   }
 }

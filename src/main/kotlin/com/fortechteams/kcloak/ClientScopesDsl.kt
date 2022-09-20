@@ -31,7 +31,6 @@ interface ClientScopesDsl {
 }
 
 class ClientScopesDslImpl(
-  private val settings: Settings,
   private val clientScopesResource: ClientScopesResource
 ) : ClientScopesDsl {
 
@@ -41,7 +40,7 @@ class ClientScopesDslImpl(
       val existingRep: ClientScopeRepresentation? = all().find { it.name == name }
 
       val rep: ClientScopeRepresentation =
-        if (existingRep == null && settings.createClientScopeIfNotExists) {
+        if (existingRep == null ) {
           all()
             .find { it.name == name }
             ?: throw StateException("Tried to create client-scope with name $name, but it still doesn't exist!")
@@ -50,7 +49,7 @@ class ClientScopesDslImpl(
             ?: throw BadExpectationException("Client scope with name $name does not exist and auto-create has been disabled in settings.")
         }
 
-      ClientScopeDslImpl(settings, clientScopesResource.get(rep.id))
+      ClientScopeDslImpl(clientScopesResource.get(rep.id))
 
     } catch (e: ForbiddenException) {
       throw PermissionException(e)
