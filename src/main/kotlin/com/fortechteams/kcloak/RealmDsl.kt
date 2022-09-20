@@ -47,9 +47,9 @@ interface RealmDsl {
 }
 
 class RealmDslImpl(
-  private val kc: Keycloak,
   private val settings: Settings,
-  private val realmRes: RealmResource
+  private val realmRes: RealmResource,
+  private val realmRep: RealmRepresentation? = null
 ) : RealmDsl {
 
   override val clients: ClientsDsl by lazy {
@@ -61,7 +61,7 @@ class RealmDslImpl(
   }
 
   override fun representation(): RealmRepresentation =
-    realmRes.toRepresentation()
+    realmRep ?: realmRes.toRepresentation()
 
   override fun update(updateFn: RealmRepresentation.() -> Unit) {
     val rep = representation()

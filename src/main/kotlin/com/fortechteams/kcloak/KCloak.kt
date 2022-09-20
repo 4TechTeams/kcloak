@@ -14,6 +14,11 @@ import javax.ws.rs.NotFoundException
 interface KCloak {
 
   /**
+   * Provides a [RealmsDsl]
+   */
+  val realms: RealmsDsl
+
+  /**
    * Returns an information object about the Keycloak server instance.
    *
    * @see ServerInfoRepresentation
@@ -37,13 +42,13 @@ interface KCloak {
   companion object {
 
     fun of(keycloakInstance: Keycloak): KCloak =
-      KCloakImpl(keycloakInstance, Settings())
+      KCloakImpl(Settings(), keycloakInstance)
 
     fun of(keycloakBuilder: KeycloakBuilder): KCloak =
       of(keycloakBuilder.build())
 
     fun of(keycloakInstance: Keycloak, settings: Settings): KCloak =
-      KCloakImpl(keycloakInstance, settings)
+      KCloakImpl(settings, keycloakInstance)
 
     fun of(keycloakInstance: Keycloak, settingsFn: Settings.() -> Unit): KCloak {
       val cs = Settings()
@@ -58,11 +63,15 @@ interface KCloak {
 }
 
 class KCloakImpl(
-  private val kc: Keycloak,
-  private val settings: Settings
+  private val settings: Settings,
+  private val kc: Keycloak
 ) : KCloak {
 
   private val log = LoggerFactory.getLogger(javaClass)
+
+  override val realms: RealmsDsl by lazy {
+    RealmsDslImpl(settings, kc.realms())
+  }
 
   override fun info(): ServerInfoRepresentation =
     try {
@@ -71,7 +80,7 @@ class KCloakImpl(
       throw PermissionException(e)
     }
 
-  override fun realm(name: String): RealmDslImpl {
+  override fun realm(name: String): RealmDsl {
     val existing = kc.realms().findAll().find { it.realm == name } != null
 
     if (!existing) {
@@ -89,7 +98,7 @@ class KCloakImpl(
     try {
       val realmRes = kc.realms().realm(name)
 
-      return RealmDslImpl(kc, settings, realmRes)
+      return RealmDslImpl(settings, realmRes)
 
     } catch (e: NotFoundException) {
       throw StateException("Requested realm $name could not be fetched from Keycloak instance!", e)
