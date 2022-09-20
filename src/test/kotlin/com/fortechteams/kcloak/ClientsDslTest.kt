@@ -13,12 +13,12 @@ internal class ClientsDslTest {
   private val clientsDsl =
     KCloak
       .of(KCUtil.localKeycloakBuilder)
-      .realm("clients-dsl-test_${UUID.randomUUID()}")
+      .realm("ClientsDslTest${UUID.randomUUID()}")
       .clients
 
   @Test
   fun `get or create`() {
-    val name = "client_${UUID.randomUUID()}"
+    val name = "ClientsDslTest${UUID.randomUUID()}"
     val c1 = clientsDsl.getOrCreate(name)
     val rep = c1.representation()
 
@@ -34,7 +34,7 @@ internal class ClientsDslTest {
 
   @Test
   fun `explicit create with exists and get`() {
-    val name = "client_${UUID.randomUUID()}"
+    val name = "ClientsDslTest${UUID.randomUUID()}"
 
     clientsDsl.create(name) {
       isEnabled = true

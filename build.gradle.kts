@@ -6,6 +6,7 @@ plugins {
   `maven-publish`
   `java-library`
   signing
+  jacoco
   id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
   kotlin("jvm") version "1.7.10"
   id("org.jetbrains.dokka") version "1.7.10"
@@ -40,12 +41,6 @@ java {
   targetCompatibility = JavaVersion.VERSION_11
   withSourcesJar()
   withJavadocJar()
-}
-
-object Meta {
-  const val githubRepo = "patternfly-kotlin/patternfly-fritz2"
-  const val release = "https://s01.oss.sonatype.org/service/local/"
-  const val snapshot = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
 }
 
 publishing {
@@ -131,6 +126,14 @@ signing {
   }
 }
 
+jacoco {
+  toolVersion = "0.8.7"
+}
+
+tasks.jacocoTestReport {
+  dependsOn(tasks.test) // tests are required to run before generating the report
+}
+
 tasks.withType<KotlinCompile> {
   kotlinOptions {
     freeCompilerArgs = listOf("-Xjsr305=strict")
@@ -151,4 +154,5 @@ tasks.withType<Test> {
       TestLogEvent.STANDARD_ERROR
     )
   }
+  finalizedBy(tasks.jacocoTestReport)
 }

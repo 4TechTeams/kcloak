@@ -11,6 +11,37 @@ that... KCloak is, or at least started as a Kotlin Client for Keycloak, because 
 was very "java-like". KCloak abstracts over all these internals, boilerplate, missing error handling, and sometimes not
 well-documented calls, but still used the java client internally for maximum compatibility.
 
+## Example
+
+```kotlin
+val kc = KCloak.of(
+  KeycloakBuilder.builder()
+    .serverUrl("http://localhost:8090")
+    .realm("master")
+)
+
+val realm = kc.realm("myRealm")
+
+// realm configuration
+realm.enable()
+realm.update {
+  displayName = "Some name..."
+  isResetPasswordAllowed = false
+}
+
+// clients
+if(!realm.clients.exists("someClient")) {
+  realm.clients.create("someClient") {
+    name = "Some Client!"
+    isEnabled = true
+    redirectUris = listOf("http://localhost:8080/*")
+  }
+}
+
+val c2 = realm.clients.getOrCreate("someOtherClient")
+c2.enable()
+```
+
 ## Installation
 
 **TBD**

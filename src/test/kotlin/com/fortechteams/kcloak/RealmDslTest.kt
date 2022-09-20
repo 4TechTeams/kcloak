@@ -12,7 +12,7 @@ internal class RealmDslTest {
 
   @Test
   fun `update realm settings`() {
-    val realmName = "realm_${UUID.randomUUID()}"
+    val realmName = "RealmDslTest_${UUID.randomUUID()}"
     val realm = kc.realm(realmName)
 
     realm.update {
@@ -28,6 +28,5 @@ internal class RealmDslTest {
     assertFalse(rep.isResetPasswordAllowed)
     assertTrue(rep.isDuplicateEmailsAllowed)
   }
-
 
 }

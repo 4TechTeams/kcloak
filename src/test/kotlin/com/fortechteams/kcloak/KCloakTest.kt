@@ -31,7 +31,7 @@ internal class KCloakTest {
 
   @Test
   fun `get realm client for missing realm with auto creation`() {
-    val realmName = "does-not-exist_${UUID.randomUUID()}"
+    val realmName = "KCloakTest_${UUID.randomUUID()}"
     val realm = kc.realm(realmName)
 
     assertEquals(realmName, realm.representation().realm)
