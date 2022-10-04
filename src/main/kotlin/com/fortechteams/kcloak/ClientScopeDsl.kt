@@ -9,6 +9,11 @@ import javax.ws.rs.NotAllowedException
 interface ClientScopeDsl {
 
   /**
+   * Returns protocol mappers for a client scope
+   */
+  val protocolMappers: ProtocolMappersDsl
+
+  /**
    * Returns the representation of a given client scope
    */
   fun representation(): ClientScopeRepresentation
@@ -28,6 +33,10 @@ class ClientScopeDslImpl(
   private val clientScopeRes: ClientScopeResource,
   private val clientScopeRep: ClientScopeRepresentation? = null
 ) : ClientScopeDsl {
+
+  override val protocolMappers: ProtocolMappersDsl by lazy {
+    ProtocolMappersDslImpl(clientScopeRes.protocolMappers)
+  }
 
   override fun representation(): ClientScopeRepresentation =
     try {
