@@ -16,10 +16,11 @@ internal class RealmsDslTest {
   }
 
   @Test
-  fun allRepresentations() {
+  fun `get all and all representations`() {
     val name = "RealmsDslTest_${UUID.randomUUID()}"
     realmsDsl.create(name) {}
 
+    assertEquals(1, realmsDsl.all().count { it.representation().realm == name })
     assertEquals(1, realmsDsl.allRepresentations().count { it.realm == name })
   }
 
@@ -42,7 +43,7 @@ internal class RealmsDslTest {
   }
 
   @Test
-  fun getRepresentation() {
+  fun `get representation`() {
     val name = "RealmsDslTest_${UUID.randomUUID()}"
     realmsDsl.create(name) {}
 
@@ -53,7 +54,7 @@ internal class RealmsDslTest {
   }
 
   @Test
-  fun getOrCreate() {
+  fun `get or create`() {
     val name1 = "RealmsDslTest_${UUID.randomUUID()}"
     val name2 = "RealmsDslTest_${UUID.randomUUID()}"
 
@@ -72,5 +73,21 @@ internal class RealmsDslTest {
     assertNotNull(rep1)
     assertEquals(name2, rep2.representation().realm)
     assertFalse(rep2.representation().isEnabled)
+  }
+
+  @Test
+  fun ensure() {
+    val name1 = "RealmsDslTest_${UUID.randomUUID()}"
+
+    val r1 = realmsDsl.ensure(name1) {
+      isEnabled = true
+    }
+
+    val r2 = realmsDsl.ensure(name1) {
+      isEnabled = true
+    }
+
+    assertTrue(r1.representation().isEnabled)
+    assertEquals(r1.representation().id, r2.representation().id)
   }
 }

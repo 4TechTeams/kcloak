@@ -54,6 +54,11 @@ interface RealmsDsl {
    * parameters accordingly, to directly enable realms. Otherwise, call [RealmDsl.enable] after creating.
    */
   fun getOrCreate(name: String): RealmDsl
+
+  /**
+   * Creates or updates a realm and returns it afterwards
+   */
+  fun ensure(name: String, updateFn: RealmRepresentation.() -> Unit): RealmDsl
 }
 
 class RealmsDslImpl(
@@ -124,4 +129,8 @@ class RealmsDslImpl(
       isEnabled = false
     }
 
+  override fun ensure(name: String, updateFn: RealmRepresentation.() -> Unit): RealmDsl =
+    get(name)
+      ?.also { it.update(updateFn) }
+      ?: create(name, updateFn)
 }
