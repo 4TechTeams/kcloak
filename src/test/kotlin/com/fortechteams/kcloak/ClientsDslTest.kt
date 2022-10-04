@@ -6,10 +6,6 @@ import kotlin.test.*
 
 internal class ClientsDslTest {
 
-  private val kc by lazy {
-    KCloak.of(KCUtil.localKeycloakBuilder)
-  }
-
   private val clientsDsl =
     KCloak
       .of(KCUtil.localKeycloakBuilder)

@@ -50,6 +50,11 @@ interface ClientsDsl {
    * parameters accordingly, to directly enable clients. Otherwise, call [ClientDsl.enable] after creating.
    */
   fun getOrCreate(name: String): ClientDsl
+
+  /**
+   * Gets & updates, or creates a client and returns it afterwards
+   */
+  fun ensure(name: String, updateFn: ClientRepresentation.() -> Unit): ClientDsl
 }
 
 class ClientsDslImpl(
@@ -109,4 +114,8 @@ class ClientsDslImpl(
       isEnabled = false
     }
 
+  override fun ensure(name: String, updateFn: ClientRepresentation.() -> Unit): ClientDsl =
+    get(name)
+      ?.also { it.update(updateFn) }
+      ?: create(name, updateFn)
 }
