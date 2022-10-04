@@ -25,12 +25,13 @@ interface ClientScopeDsl {
 }
 
 class ClientScopeDslImpl(
-  private val clientScopeResource: ClientScopeResource
+  private val clientScopeRes: ClientScopeResource,
+  private val clientScopeRep: ClientScopeRepresentation? = null
 ) : ClientScopeDsl {
 
   override fun representation(): ClientScopeRepresentation =
     try {
-      clientScopeResource.toRepresentation()
+      clientScopeRep ?: clientScopeRes.toRepresentation()
     } catch (e: ForbiddenException) {
       throw PermissionException(e)
     } catch (e: NotAllowedException) {
@@ -42,7 +43,7 @@ class ClientScopeDslImpl(
     updateFn(rep)
 
     try {
-      clientScopeResource.update(rep)
+      clientScopeRes.update(rep)
     } catch (e: ForbiddenException) {
       throw PermissionException(e)
     } catch (e: NotAllowedException) {
